@@ -1,12 +1,12 @@
 from flask import Flask, request, render_template_string
-from google.ai import generativelanguage as glm
-from google.auth import credentials
+from google.ai.generativelanguage_v1beta import TextServiceClient
+from google.ai.generativelanguage_v1beta.types import GenerateTextRequest
 import os
 
 app = Flask(__name__)
 
 # =====================================================
-# Create Google AI (Gemini) client using API key
+# Gemini client (TextService) using API key
 # =====================================================
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -14,10 +14,7 @@ API_KEY = os.environ.get("GOOGLE_API_KEY")
 if not API_KEY:
     raise ValueError("GOOGLE_API_KEY environment variable not set!")
 
-client = glm.GenerativeServiceClient(
-    credentials=credentials.AnonymousCredentials(),
-    transport=glm.GenerativeServiceRestTransport(api_key=API_KEY)
-)
+client = TextServiceClient(api_key=API_KEY)
 
 # =====================================================
 # HTML UI
@@ -112,21 +109,13 @@ def home():
             result_text = "Please enter a handle."
         else:
             try:
-                # Correct Gemini call using Google AI API key SDK
-                response = client.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=[
-                        {
-                            "role": "user",
-                            "parts": [
-                                {"text": f"Say hello to the user who searched for: {handle}"}
-                            ]
-                        }
-                    ]
+                request_obj = GenerateTextRequest(
+                    model="models/text-bison-001",
+                    prompt=f"Say hello to the user who searched for: {handle}"
                 )
 
-                # Extract text result
-                result_text = response.candidates[0].content.parts[0].text
+                response = client.generate_text(request=request_obj)
+                result_text = response.candidates[0].output
 
             except Exception as e:
                 result_text = f"Error talking to Gemini API: {str(e)}"
@@ -134,7 +123,7 @@ def home():
     return render_template_string(HTML_TEMPLATE, result=result_text)
 
 # =====================================================
-# Run the Flask app
+# Run Flask
 # =====================================================
 
 if __name__ == "__main__":
