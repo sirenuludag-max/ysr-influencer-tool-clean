@@ -1,4 +1,3 @@
 flask
 gunicorn
-google-ai-generativelanguage
-google-auth
+google-generativeai
