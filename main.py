@@ -13,7 +13,7 @@ if not API_KEY:
     raise ValueError("GOOGLE_API_KEY is not set")
 
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-pro")
 
 # =====================================================
 # HTML UI
