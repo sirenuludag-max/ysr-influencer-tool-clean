@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Load Gemini API key from Environment Variable
+# Load Gemini API key from environment variable
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 client = genai.Client(api_key=API_KEY)
 
@@ -47,6 +47,7 @@ def home():
             result_text = f"Error communicating with Gemini: {e}"
 
     return render_template_string(HTML_TEMPLATE, result=result_text)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
