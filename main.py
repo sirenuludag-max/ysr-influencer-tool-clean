@@ -38,7 +38,7 @@ def home():
         try:
             response = client.models.generate_content(
                 model="gemini-1.5-flash",
-                contents=[{"type": "text", "text": f"Say hi to {handle}"}]
+                contents=f"Say hi to {handle}"
             )
 
             result_text = response.text
