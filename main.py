@@ -1,20 +1,19 @@
 from flask import Flask, request, render_template_string
-from google.ai.generativelanguage_v1beta import TextServiceClient
-from google.ai.generativelanguage_v1beta.types import GenerateTextRequest
+import google.generativeai as genai
 import os
 
 app = Flask(__name__)
 
 # =====================================================
-# Gemini client (TextService) using API key
+# Configure Gemini API
 # =====================================================
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
-
 if not API_KEY:
-    raise ValueError("GOOGLE_API_KEY environment variable not set!")
+    raise ValueError("GOOGLE_API_KEY is not set")
 
-client = TextServiceClient(api_key=API_KEY)
+genai.configure(api_key=API_KEY)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 # =====================================================
 # HTML UI
@@ -95,7 +94,7 @@ HTML_TEMPLATE = """
 """
 
 # =====================================================
-# Flask endpoint
+# Flask Route
 # =====================================================
 
 @app.route("/", methods=["GET", "POST"])
@@ -104,26 +103,23 @@ def home():
 
     if request.method == "POST":
         handle = request.form.get("handle", "").strip()
-
+        
         if not handle:
             result_text = "Please enter a handle."
         else:
             try:
-                request_obj = GenerateTextRequest(
-                    model="models/text-bison-001",
-                    prompt=f"Say hello to the user who searched for: {handle}"
+                response = model.generate_content(
+                    f"Say hello to the user who searched for: {handle}"
                 )
-
-                response = client.generate_text(request=request_obj)
-                result_text = response.candidates[0].output
+                result_text = response.text
 
             except Exception as e:
-                result_text = f"Error talking to Gemini API: {str(e)}"
+                result_text = f"Error communicating with Gemini: {str(e)}"
 
     return render_template_string(HTML_TEMPLATE, result=result_text)
 
 # =====================================================
-# Run Flask
+# Run Server
 # =====================================================
 
 if __name__ == "__main__":
