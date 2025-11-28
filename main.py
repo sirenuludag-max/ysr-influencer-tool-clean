@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template_string
-from google import genai
+from google.ai import generativelanguage as glm
+from google.auth import credentials
 import os
 
 app = Flask(__name__)
