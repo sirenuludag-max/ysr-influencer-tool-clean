@@ -94,7 +94,7 @@ def home():
             try:
                 # SIMPLE GEMINI TEST ONLY — no tribes yet
                 response = client.models.generate_content(
-                    model="models/gemini-1.5-flash",
+                    model="gemini-1.5-flash",
                     contents=f"Say hello to the user who searched for: {handle}"
                 )
                 result_text = response.text
